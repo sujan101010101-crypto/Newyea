@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Happy New Year 2026 Sisam 💖</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+html,body{
+    margin:0;
+    padding:0;
+    overflow:hidden;
+    background:linear-gradient(180deg,#050014,#12001f,#000);
+    font-family:'Segoe UI',sans-serif;
+    color:white;
+}
+
+/* Canvas */
+canvas{
+    position:fixed;
+    inset:0;
+}
+
+/* Start Screen */
+#start{
+    position:fixed;
+    inset:0;
+    background:black;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:100;
+}
+#start span{
+    font-size:1.4em;
+    padding:20px 35px;
+    border-radius:30px;
+    border:2px solid #ff7ad9;
+    box-shadow:0 0 30px #ff7ad9;
+    animation:pulse 1.6s infinite;
+}
+@keyframes pulse{
+    0%{transform:scale(1)}
+    50%{transform:scale(1.1)}
+    100%{transform:scale(1)}
+}
+
+/* Center Text */
+#center{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    text-align:center;
+    z-index:10;
+    width:90%;
+}
+
+/* Title */
+h1{
+    font-size:3em;
+    background:linear-gradient(90deg,#ff7ad9,#ffd1f0,#ff9be6);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    letter-spacing:3px;
+    animation:glow 2s infinite alternate;
+}
+@keyframes glow{
+    from{ text-shadow:0 0 20px #ff7ad9;}
+    to{ text-shadow:0 0 45px #ffd1f0;}
+}
+
+/* Name */
+#name{
+    font-size:2em;
+    margin-top:10px;
+    color:#ffd1f0;
+    text-shadow:0 0 25px #ff7ad9;
+}
+
+/* Message */
+#msg{
+    margin-top:25px;
+    font-size:1.2em;
+    opacity:0;
+    transition:all 1.5s ease;
+}
+
+/* Floating hearts */
+.heart{
+    position:fixed;
+    bottom:-20px;
+    font-size:20px;
+    animation:floatUp 8s linear infinite;
+}
+@keyframes floatUp{
+    from{transform:translateY(0);opacity:1}
+    to{transform:translateY(-110vh);opacity:0}
+}
+</style>
+</head>
+
+<body>
+
+<div id="start">
+    <span>💖 Tap to Begin the Surprise 💖</span>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<div id="center">
+    <h1>HAPPY NEW YEAR 2026</h1>
+    <div id="name">✨ Sisam ✨</div>
+    <div id="msg"></div>
+</div>
+
+<!-- Audio -->
+<audio id="bgm" loop>
+<source src="https://cdn.pixabay.com/audio/2023/03/30/audio_3a84e0d2fa.mp3">
+</audio>
+
+<audio id="boom">
+<source src="https://cdn.pixabay.com/audio/2022/03/15/audio_87c2f9d69b.mp3">
+</audio>
+
+<script>
+/* Start */
+const start=document.getElementById("start");
+const bgm=document.getElementById("bgm");
+const boom=document.getElementById("boom");
+start.onclick=()=>{
+    start.style.display="none";
+    bgm.volume=0.55;
+    bgm.play();
+};
+
+/* Messages */
+const messages=[
+"💫 A new year, a fresh chapter 💫",
+"🌸 Sisam, you make life beautiful 🌸",
+"💖 May 2026 be filled with love 💖",
+"✨ Smiles, dreams & warm moments ✨",
+"🥂 Cheers to us & new memories 🥂",
+"❤️ Happy New Year, Sisam ❤️"
+];
+let i=0;
+const msg=document.getElementById("msg");
+setInterval(()=>{
+    msg.style.opacity=0;
+    setTimeout(()=>{
+        msg.innerHTML=messages[i%messages.length];
+        msg.style.opacity=1;
+        i++;
+    },800);
+},3500);
+
+/* Hearts */
+setInterval(()=>{
+    const h=document.createElement("div");
+    h.className="heart";
+    h.innerHTML="💖";
+    h.style.left=Math.random()*100+"vw";
+    h.style.fontSize=15+Math.random()*20+"px";
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),8000);
+},500);
+
+/* Fireworks */
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+resize();
+window.onresize=resize;
+function resize(){
+    canvas.width=innerWidth;
+    canvas.height=innerHeight;
+}
+
+let fireworks=[],particles=[];
+class Firework{
+    constructor(){
+        this.x=Math.random()*canvas.width;
+        this.y=canvas.height;
+        this.ty=Math.random()*canvas.height/2;
+        this.color=`hsl(${Math.random()*360},100%,70%)`;
+    }
+    update(){
+        this.y-=6;
+        if(this.y<=this.ty){
+            explode(this.x,this.y,this.color);
+            boom.currentTime=0;
+            boom.play();
+            return false;
+        }
+        return true;
+    }
+    draw(){
+        ctx.fillStyle=this.color;
+        ctx.fillRect(this.x,this.y,3,12);
+    }
+}
+function explode(x,y,color){
+    for(let i=0;i<70;i++){
+        particles.push({
+            x,y,
+            vx:(Math.random()-0.5)*6,
+            vy:(Math.random()-0.5)*6,
+            a:1,
+            c:color
+        });
+    }
+}
+function animate(){
+    ctx.fillStyle="rgba(0,0,0,0.25)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    if(Math.random()<0.07)fireworks.push(new Firework());
+
+    fireworks=fireworks.filter(f=>{
+        f.draw();
+        return f.update();
+    });
+
+    particles=particles.filter(p=>{
+        p.x+=p.vx;
+        p.y+=p.vy;
+        p.a-=0.02;
+        ctx.globalAlpha=p.a;
+        ctx.fillStyle=p.c;
+        ctx.fillRect(p.x,p.y,3,3);
+        ctx.globalAlpha=1;
+        return p.a>0;
+    });
+
+    requestAnimationFrame(animate);
+}
+animate();
+</script>
+
+</body>
+</html>
